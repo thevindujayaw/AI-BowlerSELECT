@@ -753,13 +753,13 @@
       </div>
     </main>
   </div>
-
+  <script src="config.js"></script>
   <script>
     if (!localStorage.getItem("token")) {
       window.location.href = "login.html";
     }
 
-    const API_BASE = "http://localhost:5001";
+    const API_BASE = window.API_BASE;
     let currentMode = "international";
     let lastPredictionData = null;
 
@@ -1182,7 +1182,7 @@
 
       } catch (err) {
         console.error(err);
-        alert("Network error: backend not reachable. Is it running on port 5001?");
+        alert(`Network error: backend not reachable at ${API_BASE}.`);
       } finally {
         btn.textContent = "🏏 Predict Top 4";
         btn.disabled = false;

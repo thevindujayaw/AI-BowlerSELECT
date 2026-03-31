@@ -478,8 +478,9 @@
     </div>
   </section>
 
+  <script src="config.js"></script>
   <script>
-    const API_BASE = "http://localhost:5001";
+    const API_BASE = window.API_BASE;
 
     // Protect page (must be logged in)
     const token = localStorage.getItem("token");

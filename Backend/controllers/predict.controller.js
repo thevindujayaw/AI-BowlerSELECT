@@ -1,18 +1,34 @@
+const fs = require("fs");
 const path = require("path");
 const { spawn } = require("child_process");
 const Prediction = require("../models/prediction.model");
 
+function resolvePythonCommand(projectRoot) {
+  if (process.env.PYTHON_BIN) {
+    return process.env.PYTHON_BIN;
+  }
+
+  const localCandidates = process.platform === "win32"
+    ? [path.join(projectRoot, "venv", "Scripts", "python.exe"), "python"]
+    : [path.join(projectRoot, "venv", "bin", "python"), "python3", "python"];
+
+  return localCandidates.find((candidate) => fs.existsSync(candidate)) || localCandidates[localCandidates.length - 1];
+}
+
 async function executePrediction(req, res, { saveToDb }) {
   try {
     const inputData = req.body;
-    const scriptPath = path.join(__dirname, "..", "..", "predict_runtime.py");
-
-    const pythonPath = path.join(__dirname, "..", "..", "venv", "bin", "python");
+    const projectRoot = path.join(__dirname, "..", "..");
+    const scriptPath = path.join(projectRoot, "predict_runtime.py");
+    const pythonCommand = resolvePythonCommand(projectRoot);
 
     const python = spawn(
-      pythonPath,
+      pythonCommand,
       [scriptPath, JSON.stringify(inputData)],
-      { windowsHide: true }
+      {
+        cwd: projectRoot,
+        windowsHide: true,
+      }
     );
 
     let stdout = "";
@@ -29,7 +45,7 @@ async function executePrediction(req, res, { saveToDb }) {
     python.on("error", (err) => {
       return res.status(500).json({
         error: "Failed to start Python process",
-        details: err.message,
+        details: `${err.message}. Tried to run: ${pythonCommand}`,
       });
     });
 
