@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --lime: #c8f135;
+      --dark: #0e0e0e;
+      --card: #161616;
+      --muted: #2a2a2a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--dark);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,241,53,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,241,53,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(200,241,53,0.12) 0%, transparent 65%);
+      top: -150px;
+      right: -150px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #282828;
+      border-radius: 20px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(200,241,53,0.12);
+      color: var(--lime);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(200,241,53,0.25);
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    h1 span { color: var(--lime); }
+
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .field-group {
+      margin-bottom: 20px;
+      animation: fadeIn 0.5s ease both;
+    }
+
+    .field-group:nth-child(1) { animation-delay: 0.1s; }
+    .field-group:nth-child(2) { animation-delay: 0.15s; }
+    .field-group:nth-child(3) { animation-delay: 0.2s; }
+    .field-group:nth-child(4) { animation-delay: 0.25s; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--muted);
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200,241,53,0.1);
+    }
+
+    input::placeholder { color: #444; }
+
+    .team-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .team-option input { display: none; }
+
+    .team-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 12px 8px;
+      background: var(--muted);
+      border: 1px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 13px;
+      font-weight: 400;
+      color: #888;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .team-option label .icon { font-size: 20px; }
+
+    .team-option input:checked + label {
+      border-color: var(--lime);
+      background: rgba(200,241,53,0.07);
+      color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200,241,53,0.1);
+    }
+
+    .team-option label:hover {
+      border-color: #555;
+      color: #ccc;
+    }
+
+    .btn {
+      width: 100%;
+      background: var(--lime);
+      color: var(--dark);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(200,241,53,0.3);
+    }
+
+    .btn:hover::after { transform: translateX(100%); }
+    .btn:active { transform: translateY(0); box-shadow: none; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #222;
+      margin: 24px 0 20px;
+    }
+
+    .login-link {
+      text-align: center;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .login-link a {
+      color: var(--lime);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover { text-decoration: underline; }
+
+    .strength-bar {
+      height: 3px;
+      background: #2a2a2a;
+      border-radius: 999px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.3s, background 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">⚡ Join the Team</div>
+    <h1>CREATE<br><span>ACCOUNT</span></h1>
+    <p class="subtitle">Sign up and get started in seconds.</p>
+
+    <form onsubmit="handleSubmit(event)">
+
+      <div class="field-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Marcus Rashford" required />
+      </div>
+
+      <div class="field-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" required />
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Min. 8 characters" required oninput="checkStrength(this.value)" />
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      </div>
+
+      <div class="field-group">
+        <label>Team Type</label>
+        <div class="team-selector">
+          <div class="team-option">
+            <input type="radio" name="team" id="international" value="international" required />
+            <label for="international">
+              <span class="icon">🌍</span>
+              International
+            </label>
+          </div>
+          <div class="team-option">
+            <input type="radio" name="team" id="school" value="school" />
+            <label for="school">
+              <span class="icon">🎓</span>
+              School
+            </label>
+          </div>
+          <div class="team-option">
+            <input type="radio" name="team" id="club" value="club" />
+            <label for="club">
+              <span class="icon">🏆</span>
+              Club
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="teamname">Team Name</label>
+        <input type="text" id="teamname" placeholder="e.g. Manchester United" required />
+      </div>
+
+      <button type="submit" class="btn">Create My Account →</button>
+    </form>
+
+    <hr class="divider" />
+    <p class="login-link">Already have an account? <a href="login.html">Log in</a></p>
+  </div>
+
+   <script>
+  const API_BASE = "http://localhost:5001";
+
+  function checkStrength(val) {
+    const fill = document.getElementById('strengthFill');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['#e74c3c','#e67e22','#f1c40f','#c8f135'];
+    const widths = ['25%','50%','75%','100%'];
+    fill.style.width = score > 0 ? widths[score - 1] : '0%';
+    fill.style.background = score > 0 ? colors[score - 1] : 'transparent';
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const teamType = document.querySelector('input[name="team"]:checked')?.value;
+    const teamName = document.getElementById("teamname").value;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          teamType,
+          teamName
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Signup failed");
+        return;
+      }
+
+      // Save JWT token
+      localStorage.setItem("token", data.token);
+
+      alert("Account created successfully!");
+
+      // Redirect to homepage
+      window.location.href = "homepage.html";
+
+    } catch (err) {
+      console.error(err);
+      alert("Server error. Make sure backend is running.");
+    }
+  }
+</script>
+</body>
+</html>

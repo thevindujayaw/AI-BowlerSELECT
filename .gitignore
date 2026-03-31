@@ -1,0 +1,23 @@
+# Environment and secrets
+.env
+Backend/.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node
+Backend/node_modules/
+
+# OS and editor
+.DS_Store
+.vscode/
+
+# Local cache/output
+catboost_info/
+dist/
+build/
+*.log

@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BowlerOpton — Prediction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --lime: #c8f135;
+      --dark: #0e0e0e;
+      --card: #161616;
+      --muted: #2a2a2a;
+      --border: #282828;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--dark);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,241,53,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,241,53,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(200,241,53,0.08) 0%, transparent 65%);
+      top: -100px;
+      right: -100px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.6; }
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(14,14,14,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.05em;
+      color: #fff;
+    }
+    .nav-logo span { color: var(--lime); }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 0%; height: 2px;
+      background: var(--lime);
+      border-radius: 999px;
+      transition: width 0.25s;
+    }
+
+    .nav-links a:hover { color: #fff; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--lime); }
+    .nav-links a.active::after { width: 100%; }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+  .sidebar {
+  width: 320px;
+  min-width: 320px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 24px 20px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.sidebar::after {
+  content: "";
+  display: block;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .sidebar-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.05em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mode-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--muted);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+     
+
+  .field-help {
+  font-size: 10px;
+  color: #777;
+  line-height: 1.4;
+  font-weight: 300;
+  margin-top: -2px;
+}
+
+    .mode-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      color: #666;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--lime);
+      color: var(--dark);
+    }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .hint-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .hint-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid #3a3a3a;
+      background: #121212;
+      color: var(--lime);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .hint-box {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 220px;
+      padding: 10px 12px;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      background: #121212;
+      color: #aaa;
+      font-size: 12px;
+      line-height: 1.6;
+      z-index: 20;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+
+    .hint-box.show {
+      display: block;
+    }
+
+    select {
+      width: 100%;
+      background: var(--muted);
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 24 24' stroke='%23555' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    select:focus {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200,241,53,0.1);
+    }
+
+    select option { background: #1a1a1a; }
+
+  .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 14px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+   }
+
+    .checkbox-row input[type="checkbox"] {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background: var(--muted);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .checkbox-row input[type="checkbox"]:checked {
+      background: var(--lime);
+      border-color: var(--lime);
+    }
+
+    .checkbox-row input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--dark);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .checkbox-row span {
+      font-size: 13px;
+      color: #888;
+      font-weight: 400;
+    }
+
+  .btn-predict {
+  width: 100%;
+  background: var(--lime);
+  color: var(--dark);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  transition: transform 0.15s, box-shadow 0.2s, opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+    .btn-predict:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    .main {
+      flex: 1;
+      padding: 40px 52px;
+    }
+
+    .main-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 0.03em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .main-title span { color: var(--lime); }
+
+    .main-subtitle {
+      font-size: 13px;
+      color: #444;
+      font-weight: 300;
+      margin-top: 6px;
+      margin-bottom: 18px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 40px;
+      text-align: center;
+      border: 1px dashed #222;
+      border-radius: 16px;
+      background: rgba(22,22,22,0.5);
+    }
+
+    .empty-icon { font-size: 52px; margin-bottom: 20px; opacity: 0.6; }
+    .empty-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      color: #333;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+    }
+    .empty-desc {
+      font-size: 14px;
+      color: #3a3a3a;
+      font-weight: 300;
+      max-width: 340px;
+      line-height: 1.6;
+    }
+    .empty-desc strong { color: var(--lime); }
+
+    .results-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      transition: border-color 0.2s, transform 0.2s;
+      animation: fadeUp 0.35s ease both;
+    }
+
+    .result-card:hover { border-color: rgba(200,241,53,0.3); transform: translateY(-2px); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-rank {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: #444;
+      margin-bottom: 8px;
+    }
+
+    .result-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: #fff;
+      letter-spacing: 0.03em;
+      margin-bottom: 6px;
+    }
+
+    .result-score { font-size: 13px; color: var(--lime); font-weight: 500; }
+
+    .small-muted { font-size: 12px; color: #777; margin-top: 6px; }
+
+    .card-left { text-align: left; }
+
+    #local-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Bowler<span>Opton</span></div>
+    <ul class="nav-links">
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="#" class="active">Prediction</a></li>
+      <li><a href="youraccount.html">Your Account</a></li>
+    </ul>
+  </nav>
+
+  <div class="layout">
+
+   <aside class="sidebar">
+  <div class="sidebar-title">⚙️ Inputs</div>
+
+  <div>
+    <div class="mode-label">Mode</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('international', this)">International</button>
+      <button class="mode-btn" onclick="setMode('local', this)">Local</button>
+    </div>
+  </div>
+
+  <!-- INTERNATIONAL -->
+  <div id="international-fields">
+    <div class="field">
+      <label>Match Type</label>
+      <select id="int-matchType">
+        <option>ODI</option>
+        <option selected>T20</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label for="int-pitchType">Pitch Type</label>
+        <div class="hint-wrap">
+          <button type="button" class="hint-btn" onclick="toggleHint('int-pitch-hint')">?</button>
+          <div class="hint-box" id="int-pitch-hint">
+            <div><strong>Green:</strong> visible grass cover, fresher surface, usually more help for seam and movement.</div>
+            <div style="margin-top:8px;"><strong>Dry:</strong> dry, hard-looking surface, little grass, may crack or wear later, usually more spin-friendly as match goes on.</div>
+            <div style="margin-top:8px;"><strong>Slow:</strong> dull surface, ball expected to grip or hold, not much pace off the pitch, batters may need to generate power.</div>
+            <div style="margin-top:8px;"><strong>Flat:</strong> even, firm-looking surface, consistent bounce, not much visible grass or dryness issues, usually more batting-friendly.</div>
+            <div style="margin-top:8px;"><strong>Other:</strong> if user is unsure or the surface looks mixed.</div>
+          </div>
+        </div>
+      </div>
+      <select id="int-pitchType">
+        <option>Dry</option>
+        <option>Green</option>
+        <option>Flat</option>
+        <option selected>Slow</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label for="int-yourTeam">Your Team</label>
+        <div class="hint-wrap">
+          <button type="button" class="hint-btn" onclick="toggleHint('int-team-hint')">?</button>
+          <div class="hint-box" id="int-team-hint">
+            International recommendations are currently configured for Sri Lanka selections, so this field stays fixed to Sri Lanka.
+          </div>
+        </div>
+      </div>
+      <select id="int-yourTeam" disabled>
+        <option selected>Sri Lanka</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Ground</label>
+      <select id="int-ground">
+        <option selected>R. Premadasa Stadium</option>
+        <option>Pallekele International Cricket Stadium</option>
+        <option>Galle International Stadium</option>
+        <option>Rangiri Dambulla International Stadium</option>
+        <option>Mahinda Rajapaksa Stadium</option>
+        <option>SSC Colombo</option>
+        <option>Sydney Cricket Ground</option>
+        <option>Melbourne Cricket Ground</option>
+        <option>The Oval</option>
+        <option>Lord's</option>
+        <option>Eden Park</option>
+        <option>Wankhede Stadium</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Opposition Team</label>
+      <select id="int-oppositionTeam">
+        <option>India</option>
+        <option>Australia</option>
+        <option>England</option>
+        <option>Pakistan</option>
+        <option>New Zealand</option>
+        <option>South Africa</option>
+        <option>Afghanistan</option>
+        <option>Bangladesh</option>
+        <option>West Indies</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label for="int-startTime">Start Time</label>
+        <div class="hint-wrap">
+          <button type="button" class="hint-btn" onclick="toggleHint('int-time-hint')">?</button>
+          <div class="hint-box" id="int-time-hint">
+            Weather is fetched for the nearest forecast hour. ODI matches usually begin earlier in the day, while many T20s start in the afternoon or evening.
+          </div>
+        </div>
+      </div>
+      <select id="int-startTime">
+        <option>09:00:00</option>
+        <option>10:00:00</option>
+        <option>11:00:00</option>
+        <option>12:00:00</option>
+        <option>13:00:00</option>
+        <option>14:00:00</option>
+        <option>15:00:00</option>
+        <option>16:00:00</option>
+        <option>17:00:00</option>
+        <option>18:00:00</option>
+        <option selected>14:00:00</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LOCAL -->
+  <div id="local-fields" style="display:none;">
+    <div class="field">
+      <label>Match Type</label>
+      <select id="loc-matchType">
+        <option>ODI</option>
+        <option selected>T20</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label for="loc-pitchType">Pitch Type</label>
+        <div class="hint-wrap">
+          <button type="button" class="hint-btn" onclick="toggleHint('loc-pitch-hint')">?</button>
+          <div class="hint-box" id="loc-pitch-hint">
+            <div><strong>Green:</strong> visible grass cover, fresher surface, usually more help for seam and movement.</div>
+            <div style="margin-top:8px;"><strong>Dry:</strong> dry, hard-looking surface, little grass, may crack or wear later, usually more spin-friendly as match goes on.</div>
+            <div style="margin-top:8px;"><strong>Slow:</strong> dull surface, ball expected to grip or hold, not much pace off the pitch, batters may need to generate power.</div>
+            <div style="margin-top:8px;"><strong>Flat:</strong> even, firm-looking surface, consistent bounce, not much visible grass or dryness issues, usually more batting-friendly.</div>
+            <div style="margin-top:8px;"><strong>Other:</strong> if user is unsure or the surface looks mixed.</div>
+          </div>
+        </div>
+      </div>
+      <select id="loc-pitchType">
+        <option>Dry</option>
+        <option>Green</option>
+        <option selected>Slow</option>
+        <option>Flat</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Sri Lanka Location</label>
+      <select id="loc-location">
+        <option selected>Colombo</option>
+        <option>Kandy</option>
+        <option>Galle</option>
+        <option>Jaffna</option>
+        <option>Dambulla</option>
+        <option>Hambantota</option>
+        <option>Kurunegala</option>
+        <option>Matara</option>
+        <option>Negombo</option>
+        <option>Rathnapura</option>
+        <option>Anuradhapura</option>
+        <option>Trincomalee</option>
+        <option>Batticaloa</option>
+        <option>Badulla</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label-row">
+        <label for="loc-startTime">Start Time</label>
+        <div class="hint-wrap">
+          <button type="button" class="hint-btn" onclick="toggleHint('loc-time-hint')">?</button>
+          <div class="hint-box" id="loc-time-hint">
+            Forecast weather is fetched for the selected Sri Lankan location and the nearest hour to this start time.
+          </div>
+        </div>
+      </div>
+      <select id="loc-startTime">
+        <option>09:00:00</option>
+        <option>10:00:00</option>
+        <option>11:00:00</option>
+        <option>12:00:00</option>
+        <option>13:00:00</option>
+        <option>14:00:00</option>
+        <option>15:00:00</option>
+        <option>16:00:00</option>
+        <option>17:00:00</option>
+        <option>18:00:00</option>
+        <option selected>14:00:00</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="checkbox-row">
+    <input type="checkbox" id="feature-importance" />
+    <span>Show feature importance</span>
+  </div>
+
+  <button class="btn-predict" onclick="runPrediction()">🏏 Predict Top 4</button>
+</aside>
+
+    <main class="main">
+      <div class="main-title">🏏 Bowler<span>Option</span> AI</div>
+      <p class="main-subtitle">Demo app — This is made to optimise selection of bowlers for a certain match.</p>
+
+      <!-- ✅ CSV DOWNLOAD -->
+      <div style="display:flex; gap:10px; margin-bottom:18px;">
+        <button
+          id="btn-download-csv"
+          onclick="downloadCSV()"
+          disabled
+          style="
+            background:#121212;
+            border:1px solid var(--border);
+            color:#bbb;
+            padding:10px 14px;
+            border-radius:10px;
+            font-size:13px;
+            font-weight:500;
+            cursor:not-allowed;
+            transition:all .2s;
+          "
+        >
+          ⬇ Download CSV
+        </button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('recommendations', this)">🏆 Recommendations</div>
+        <div class="tab" onclick="switchTab('explanations', this)">🧠 Explanations</div>
+      </div>
+
+      <div class="panel active" id="panel-recommendations">
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon">🎯</div>
+          <div class="empty-title">Ready to Predict</div>
+          <p class="empty-desc">Choose inputs and click <strong>Predict Top 4</strong> to get recommendations.</p>
+        </div>
+
+        <div id="weather-preview" style="display:none; margin-bottom:18px;"></div>
+        <div class="results-grid" id="results-grid"></div>
+        <div id="alternatives-wrap" style="display:none; margin-top:18px;">
+          <div class="result-card card-left">
+            <div class="result-rank">Backup Options</div>
+            <div id="alternatives-list" style="display:grid; gap:10px; margin-top:12px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-explanations">
+        <div id="explanations-empty" class="empty-state">
+          <div class="empty-icon">🧠</div>
+          <div class="empty-title">No Explanations Yet</div>
+          <p class="empty-desc">Run a prediction first to see explanations here.</p>
+        </div>
+
+        <div id="explanations-list" style="display:none;" class="space-y-3"></div>
+        <div id="model-factors-wrap" style="display:none; margin-top:18px;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("token")) {
+      window.location.href = "login.html";
+    }
+
+    const API_BASE = "http://localhost:5001";
+    let currentMode = "international";
+    let lastPredictionData = null;
+
+    function getToken() {
+      return localStorage.getItem("token");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function setMode(mode, btn) {
+      currentMode = mode;
+
+      document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const intBox = document.getElementById("international-fields");
+      const locBox = document.getElementById("local-fields");
+
+      if (mode === "international") {
+        intBox.style.display = "flex";
+        intBox.style.flexDirection = "column";
+        intBox.style.gap = "20px";
+        locBox.style.display = "none";
+      } else {
+        locBox.style.display = "flex";
+        locBox.style.flexDirection = "column";
+        locBox.style.gap = "20px";
+        intBox.style.display = "none";
+      }
+
+      resetUI();
+    }
+
+    function switchTab(tab, el) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      el.classList.add("active");
+      document.getElementById("panel-" + tab).classList.add("active");
+    }
+
+    function toggleHint(id) {
+      document.querySelectorAll(".hint-box").forEach((box) => {
+        if (box.id !== id) box.classList.remove("show");
+      });
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("show");
+    }
+
+    function resetUI() {
+      document.getElementById("empty-state").style.display = "flex";
+      document.getElementById("results-grid").style.display = "none";
+      document.getElementById("results-grid").innerHTML = "";
+      document.getElementById("weather-preview").style.display = "none";
+      document.getElementById("weather-preview").innerHTML = "";
+      document.getElementById("alternatives-wrap").style.display = "none";
+      document.getElementById("alternatives-list").innerHTML = "";
+
+      document.getElementById("explanations-empty").style.display = "flex";
+      document.getElementById("explanations-list").style.display = "none";
+      document.getElementById("explanations-list").innerHTML = "";
+      document.getElementById("model-factors-wrap").style.display = "none";
+      document.getElementById("model-factors-wrap").innerHTML = "";
+
+      // Disable CSV until next prediction
+      lastPredictionData = null;
+      const btnCsv = document.getElementById("btn-download-csv");
+      btnCsv.disabled = true;
+      btnCsv.style.cursor = "not-allowed";
+      btnCsv.style.borderColor = "var(--border)";
+      btnCsv.style.color = "#bbb";
+    }
+
+  function buildPayload() {
+    const showImportance = document.getElementById("feature-importance").checked;
+
+    if (currentMode === "international") {
+      return {
+        mode: "international",
+        match_type: document.getElementById("int-matchType").value,
+        pitch_type: document.getElementById("int-pitchType").value,
+        ground: document.getElementById("int-ground").value,
+        your_team: "Sri Lanka",
+        opposition_team: document.getElementById("int-oppositionTeam").value,
+        start_time: document.getElementById("int-startTime").value,
+        show_feature_importance: showImportance
+      };
+    }
+
+    return {
+      mode: "local",
+      match_type: document.getElementById("loc-matchType").value,
+      pitch_type: document.getElementById("loc-pitchType").value,
+      location: document.getElementById("loc-location").value,
+      start_time: document.getElementById("loc-startTime").value,
+      show_feature_importance: showImportance
+    };
+  }
+
+    function downloadCSV() {
+      if (!lastPredictionData || !lastPredictionData.results) {
+        alert("Run a prediction first.");
+        return;
+      }
+
+      const payload = buildPayload();
+      const mode = payload.mode;
+      const results = lastPredictionData.results || [];
+      const rows = [];
+
+      rows.push(["BowlerOpton AI Prediction Export"]);
+      rows.push(["Mode", mode]);
+      rows.push(["Match Type", payload.match_type || ""]);
+      rows.push(["Pitch Type", payload.pitch_type || ""]);
+      rows.push(["Start Time", payload.start_time || ""]);
+
+      if (mode === "international") {
+        rows.push(["Ground", payload.ground || ""]);
+        rows.push(["Your Team", payload.your_team || ""]);
+        rows.push(["Opposition", payload.opposition_team || ""]);
+      } else {
+        rows.push(["Location", payload.location || ""]);
+      }
+
+      if (lastPredictionData.weather) {
+        const w = lastPredictionData.weather;
+        rows.push([]);
+        rows.push(["Fetched Weather"]);
+        rows.push(["Weather Location", w.location || ""]);
+        rows.push(["Weather Time", w.weather_time || ""]);
+        rows.push(["Temperature (C)", w.temperature_2m ?? ""]);
+        rows.push(["Humidity (%)", w.relative_humidity_2m ?? ""]);
+        rows.push(["Dew Point (C)", w.dew_point_2m ?? ""]);
+        rows.push(["Cloud Cover (%)", w.cloud_cover ?? ""]);
+        rows.push(["Wind Speed (km/h)", w.wind_speed_10m ?? ""]);
+        rows.push(["Wind Gusts (km/h)", w.wind_gusts_10m ?? ""]);
+        rows.push(["Pressure", w.pressure_msl ?? ""]);
+        rows.push(["Precipitation", w.precipitation ?? ""]);
+      }
+
+      rows.push([]);
+      rows.push([
+        "Rank",
+        mode === "international" ? "Bowler Name" : "Bowler Type",
+        "Bowler Type",
+        "Model Score",
+        "Summary",
+        "Risk Note"
+      ]);
+
+      results.forEach((item, idx) => {
+        rows.push([
+          idx + 1,
+          item.bowler_name || item.bowler_type || "",
+          item.bowler_type || "",
+          item.score ?? "",
+          item.summary ?? "",
+          item.risk_note ?? ""
+        ]);
+      });
+
+      const csvContent = rows
+        .map(row => row.map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `bowleropton_${mode}_prediction.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function renderResults(data) {
+      const grid = document.getElementById("results-grid");
+      const weatherBox = document.getElementById("weather-preview");
+      const altWrap = document.getElementById("alternatives-wrap");
+      const altList = document.getElementById("alternatives-list");
+      const explEmpty = document.getElementById("explanations-empty");
+      const explList = document.getElementById("explanations-list");
+      const modelFactorsWrap = document.getElementById("model-factors-wrap");
+
+      grid.innerHTML = "";
+
+      function metricChip(label, value) {
+        return `
+          <span style="
+            display:inline-flex;align-items:center;gap:6px;
+            padding:6px 10px;border:1px solid #2a2a2a;
+            border-radius:999px;background:#121212;
+            color:#bbb;font-size:12px;">
+            <span style="color:#777;">${escapeHtml(label)}:</span>
+            <span style="color:var(--lime);font-weight:600;">${escapeHtml(value)}</span>
+          </span>
+        `;
+      }
+
+      function confidencePill(level) {
+        let bg = "#1a1a1a";
+        let br = "#2a2a2a";
+        let tx = "#bbb";
+        const v = String(level || "").toLowerCase();
+        if (v === "high") { bg = "rgba(200,241,53,0.14)"; br = "rgba(200,241,53,0.35)"; tx = "var(--lime)"; }
+        if (v === "medium") { bg = "rgba(255,255,255,0.06)"; br = "rgba(255,255,255,0.12)"; tx = "#ddd"; }
+        if (v === "balanced") { bg = "rgba(255,255,255,0.06)"; br = "rgba(255,255,255,0.12)"; tx = "#ddd"; }
+        return `
+          <span style="
+            display:inline-flex;align-items:center;
+            padding:6px 10px;border:1px solid ${br};
+            border-radius:999px;background:${bg};
+            color:${tx};font-size:12px;font-weight:600;">
+            ${escapeHtml(level || "—")}
+          </span>
+        `;
+      }
+
+      if (data.weather) {
+        const w = data.weather;
+        weatherBox.innerHTML = `
+          <div class="result-card card-left">
+            <div class="result-rank">Fetched Weather</div>
+            <div style="color:#bbb;font-size:13px;line-height:1.6;margin-top:8px;">
+              Using forecast weather for <span style="color:#fff;font-weight:600;">${escapeHtml(w.location || "Selected location")}</span>
+              near <span style="color:var(--lime);font-weight:600;">${escapeHtml(w.weather_time || w.start_time || "")}</span>.
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+              ${metricChip("Temp", `${w.temperature_2m ?? "—"}°C`)}
+              ${metricChip("Humidity", `${w.relative_humidity_2m ?? "—"}%`)}
+              ${metricChip("Dew Point", `${w.dew_point_2m ?? "—"}°C`)}
+              ${metricChip("Cloud", `${w.cloud_cover ?? "—"}%`)}
+              ${metricChip("Wind", `${w.wind_speed_10m ?? "—"} km/h`)}
+              ${metricChip("Gusts", `${w.wind_gusts_10m ?? "—"} km/h`)}
+              ${metricChip("Pressure", w.pressure_msl ?? "—")}
+              ${metricChip("Rain", w.precipitation ?? "—")}
+              ${metricChip("Match Period", w.match_period || "—")}
+            </div>
+          </div>
+        `;
+        weatherBox.style.display = "block";
+      }
+
+      (data.results || []).forEach((item, i) => {
+        const rank = i + 1;
+        const isTop = rank === 1;
+        const name = item.bowler_name || item.bowler_type || "Unknown";
+        const score = item.score ?? "-";
+        const bowlerTypeLine = item.bowler_type && item.bowler_name
+          ? `<div class="small-muted">${escapeHtml(item.bowler_type)}</div>`
+          : "";
+
+        const card = document.createElement("div");
+        card.className = "result-card";
+        card.style.animationDelay = (i * 0.08) + "s";
+        card.innerHTML = `
+          <div class="result-rank"># ${rank}${isTop ? " — TOP PICK" : ""}</div>
+          <div class="result-name">${escapeHtml(name)}</div>
+          <div class="result-score">Score: ${escapeHtml(score)}</div>
+          ${bowlerTypeLine}
+        `;
+        grid.appendChild(card);
+      });
+
+      document.getElementById("empty-state").style.display = "none";
+      grid.style.display = "grid";
+
+      if ((data.results || []).length) {
+        explEmpty.style.display = "none";
+        explList.style.display = "block";
+        explList.innerHTML = (data.results || []).map((item, idx) => {
+          const name = item.bowler_name || item.bowler_type || `Rank ${idx + 1}`;
+          const bowlerType = item.bowler_type ? `<div class="small-muted">${escapeHtml(item.bowler_type)}</div>` : "";
+          const reasons = Array.isArray(item.key_reasons) ? item.key_reasons : [];
+          const reasonsHtml = reasons.length
+            ? `<ul style="margin-top:10px; padding-left:18px; color:#cfcfcf; font-size:13px; line-height:1.7;">${reasons.map(r => `<li>${escapeHtml(r)}</li>`).join("")}</ul>`
+            : "";
+          const riskHtml = item.risk_note
+            ? `
+              <div style="margin-top:12px; padding:10px 12px; border:1px solid #2a2a2a; border-radius:12px; background:#121212;">
+                <div style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#777; margin-bottom:6px;">Risk note</div>
+                <div style="color:#bbb; font-size:13px; line-height:1.6;">${escapeHtml(item.risk_note)}</div>
+              </div>
+            `
+            : "";
+
+          return `
+            <div class="result-card card-left">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div>
+                  <div class="result-rank"># ${idx + 1}</div>
+                  <div class="result-name" style="margin-bottom:4px;">${escapeHtml(name)}</div>
+                  ${bowlerType}
+                </div>
+                <div>${confidencePill(idx === 0 ? "High" : idx < 3 ? "Medium" : "Balanced")}</div>
+              </div>
+              ${item.summary ? `<div style="margin-top:10px; color:#bbb; font-size:13px; line-height:1.6;">${escapeHtml(item.summary)}</div>` : ""}
+              ${reasonsHtml}
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+                ${metricChip("Score", item.score ?? "—")}
+              </div>
+              ${riskHtml}
+            </div>
+          `;
+        }).join("");
+      } else {
+        explEmpty.style.display = "flex";
+        explList.style.display = "none";
+      }
+
+      if ((data.alternatives || []).length) {
+        altList.innerHTML = (data.alternatives || []).slice(0, 6).map((item, idx) => {
+          const name = item.bowler_name || item.bowler_type || "Unknown";
+          const typeLine = item.bowler_name && item.bowler_type ? `<div class="small-muted">${escapeHtml(item.bowler_type)}</div>` : "";
+          return `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid #2a2a2a;border-radius:12px;background:#121212;">
+              <div>
+                <div style="color:#fff;font-weight:600;font-size:14px;">${idx + 5}. ${escapeHtml(name)}</div>
+                ${typeLine}
+              </div>
+              <div style="color:var(--lime);font-weight:700;">${escapeHtml(item.score ?? "—")}</div>
+            </div>
+          `;
+        }).join("");
+        altWrap.style.display = "block";
+      }
+
+      if (data.model_factors) {
+        const overall = data.model_factors.overall_top_features || [];
+        const condition = data.model_factors.condition_related_features || [];
+        modelFactorsWrap.innerHTML = `
+          <div class="result-card card-left">
+            <div class="result-rank">Model Factors</div>
+            <div style="color:#bbb;font-size:13px;line-height:1.6;margin-top:8px;">
+              Optional model-level factors for users who want to inspect what the model values most strongly.
+            </div>
+            <div style="margin-top:14px;">
+              <div style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#777; margin-bottom:8px;">Overall Top Features</div>
+              <div style="display:grid; gap:8px;">
+                ${overall.map((item) => `
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #2a2a2a;border-radius:12px;background:#121212;">
+                    <div style="color:#ddd;font-size:13px;">${escapeHtml(item.feature)}</div>
+                    <div style="color:var(--lime);font-weight:700;">${escapeHtml(item.importance)}</div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+            <div style="margin-top:16px;">
+              <div style="font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#777; margin-bottom:8px;">Weather And Condition Factors</div>
+              <div style="display:grid; gap:8px;">
+                ${condition.map((item) => `
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #2a2a2a;border-radius:12px;background:#121212;">
+                    <div style="color:#ddd;font-size:13px;">${escapeHtml(item.feature)}</div>
+                    <div style="color:var(--lime);font-weight:700;">${escapeHtml(item.importance)}</div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+        modelFactorsWrap.style.display = "block";
+      }
+    }
+
+    async function runPrediction() {
+      const btn = document.querySelector(".btn-predict");
+      const token = getToken();
+
+      if (!token) {
+        alert("No token found. Please login first.");
+        return;
+      }
+
+      const payload = buildPayload();
+
+      btn.textContent = "⏳ Predicting...";
+      btn.disabled = true;
+      btn.style.opacity = "0.7";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/predict`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || data.message || "Prediction failed");
+          console.error(data);
+          return;
+        }
+
+        if (data.error) {
+          alert(data.error);
+          console.error(data);
+          return;
+        }
+
+        renderResults(data);
+
+        // Enable CSV after successful prediction
+        lastPredictionData = data;
+        const btnCsv = document.getElementById("btn-download-csv");
+        btnCsv.disabled = false;
+        btnCsv.style.cursor = "pointer";
+        btnCsv.style.borderColor = "rgba(200,241,53,0.35)";
+        btnCsv.style.color = "var(--lime)";
+
+      } catch (err) {
+        console.error(err);
+        alert("Network error: backend not reachable. Is it running on port 5001?");
+      } finally {
+        btn.textContent = "🏏 Predict Top 4";
+        btn.disabled = false;
+        btn.style.opacity = "";
+      }
+    }
+
+    const intBox = document.getElementById("international-fields");
+    intBox.style.display = "flex";
+    intBox.style.flexDirection = "column";
+    intBox.style.gap = "20px";
+
+    const locBox = document.getElementById("local-fields");
+    locBox.style.flexDirection = "column";
+    locBox.style.gap = "20px";
+  </script>
+</body>
+</html>
